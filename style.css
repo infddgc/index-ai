@@ -1,26 +1,45 @@
 body {
   margin: 0;
   font-family: -apple-system;
-  background: linear-gradient(135deg, #0f172a, #020617);
+  background: #0f172a;
   color: white;
 }
 
+/* LOGIN */
+.auth {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth input {
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+}
+
+.auth button {
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+}
+
+/* APP */
 .app {
   display: flex;
   height: 100vh;
 }
 
-/* Sidebar */
+/* SIDEBAR */
 .sidebar {
-  width: 260px;
-  background: rgba(2,6,23,0.8);
-  backdrop-filter: blur(20px);
+  width: 250px;
+  background: #020617;
   padding: 15px;
-  border-right: 1px solid #1e293b;
-}
-
-.sidebar h2 {
-  text-align: center;
 }
 
 .sidebar button {
@@ -30,42 +49,48 @@ body {
   color: white;
 }
 
-/* Main */
+/* MAIN */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
+/* TOPBAR */
+.topbar {
+  display: none;
+  padding: 10px;
+  background: #020617;
+}
+
+/* CHAT */
 #chat {
   flex: 1;
-  padding: 20px;
+  padding: 15px;
   overflow-y: auto;
 }
 
-/* Messages */
 .message {
-  max-width: 700px;
-  margin: 10px auto;
-  padding: 14px;
+  max-width: 80%;
+  margin: 10px;
+  padding: 12px;
   border-radius: 12px;
-  animation: fade 0.2s ease;
 }
 
 .user {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: #2563eb;
+  margin-left: auto;
 }
 
 .bot {
-  background: rgba(30,41,59,0.8);
-  backdrop-filter: blur(10px);
+  background: #1e293b;
 }
 
-/* Input */
+/* INPUT */
 .input-area {
   display: flex;
-  padding: 15px;
-  background: rgba(2,6,23,0.8);
+  padding: 10px;
+  background: #020617;
 }
 
 input {
@@ -73,24 +98,28 @@ input {
   padding: 12px;
   border-radius: 10px;
   border: none;
-  background: #1e293b;
-  color: white;
 }
 
 button {
-  margin-left: 8px;
-  padding: 10px 14px;
+  margin-left: 5px;
+  padding: 10px;
   border-radius: 10px;
   border: none;
-  cursor: pointer;
-  transition: 0.2s;
 }
 
-button:hover {
-  transform: scale(1.05);
-}
+/* MOBILE */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    height: 100%;
+  }
 
-@keyframes fade {
-  from {opacity: 0; transform: translateY(5px);}
-  to {opacity: 1;}
+  .sidebar.active {
+    left: 0;
+  }
+
+  .topbar {
+    display: block;
+  }
 }
