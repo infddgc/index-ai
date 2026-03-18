@@ -1,0 +1,40 @@
+export function initSettings() {
+  const btn = document.createElement("button");
+  btn.innerText = "⚙️ Настройки";
+  btn.onclick = openSettings;
+  document.body.appendChild(btn);
+}
+
+function openSettings() {
+  const modal = document.createElement("div");
+  modal.id = "settingsModal";
+  modal.innerHTML = `
+    <h2>Настройки</h2>
+    <label>Тема:
+      <select id="themeSelect">
+        <option value="dark">Тёмная</option>
+        <option value="light">Светлая</option>
+      </select>
+    </label>
+    <label>
+      Озвучивать ответы:
+      <input type="checkbox" id="voiceToggle" checked>
+    </label>
+    <button onclick="saveSettings()">Сохранить</button>
+  `;
+  document.body.appendChild(modal);
+
+  const theme = localStorage.getItem("theme") || "dark";
+  const voice = localStorage.getItem("voice") !== "false";
+  document.getElementById("themeSelect").value = theme;
+  document.getElementById("voiceToggle").checked = voice;
+}
+
+window.saveSettings = () => {
+  const theme = document.getElementById("themeSelect").value;
+  const voice = document.getElementById("voiceToggle").checked;
+  localStorage.setItem("theme", theme);
+  localStorage.setItem("voice", voice);
+  document.body.setAttribute("data-theme", theme);
+  alert("Настройки сохранены!");
+};
