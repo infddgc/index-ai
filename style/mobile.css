@@ -1,0 +1,16 @@
+@media (max-width: 768px) {
+  .layout { flex-direction: column; }
+  #sidebar {
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: -250px;
+    z-index: 10;
+    transition: left 0.3s;
+  }
+  #sidebar.active { left: 0; }
+
+  .user, .bot {
+    max-width: 95%;
+  }
+}
