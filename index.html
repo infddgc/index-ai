@@ -3,58 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Index AI</title>
+<title>Index AI PRO</title>
 
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
+<link rel="stylesheet" href="style/main.css">
+<link rel="stylesheet" href="style/chat.css">
+<link rel="stylesheet" href="style/mobile.css">
+<link rel="stylesheet" href="style/profile.css">
+<link rel="stylesheet" href="style/settings.css">
+
 </head>
 <body>
-
-<!-- LOGIN -->
-<div id="auth" class="auth">
-  <h1>Index</h1>
-  <input id="login" placeholder="Логин">
-  <input id="password" type="password" placeholder="Пароль">
-  <button onclick="register()">Регистрация</button>
-  <button onclick="loginUser()">Войти</button>
-</div>
-
-<!-- APP -->
-<div class="app" id="app" style="display:none;">
-
-  <div class="sidebar" id="sidebar">
-    <h2>Index</h2>
-    <button onclick="newChat()">+ Новый чат</button>
-    <button onclick="logout()">Выйти</button>
-    <div id="chatList"></div>
-  </div>
-
-  <div class="main">
-    <div class="topbar">
-      <button onclick="toggleMenu()">☰</button>
-      <span>Index</span>
-    </div>
-
-    <div id="chat"></div>
-
-    <div class="input-area">
-      <input id="msg" placeholder="Напиши сообщение...">
-      <button onclick="send()">➤</button>
-    </div>
-  </div>
-
-</div>
-
-<script src="script.js"></script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
-</script>
-
-</body>
-</html>
+<div id="app"></div>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
