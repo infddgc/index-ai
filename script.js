@@ -1,17 +1,18 @@
-﻿const chatDiv = document.getElementById("chat");
-const typing = document.getElementById("typing");
-
+const chatDiv = document.getElementById("chat");
 let chats = JSON.parse(localStorage.getItem("index_chats") || "{}");
 let currentChat = null;
 
-// ===== ENTER ОТПРАВКА =====
-msg.addEventListener("keypress", e => {
-  if (e.key === "Enter") send();
+// ENTER
+document.getElementById("msg").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    send();
+  }
 });
 
-// ===== ЧАТЫ =====
+// ЧАТЫ
 function newChat() {
-  const id = "Chat " + Date.now();
+  const id = "Чат " + Date.now();
   chats[id] = [];
   currentChat = id;
   save();
@@ -32,7 +33,7 @@ function renderChats() {
   }
 }
 
-// ===== СООБЩЕНИЯ =====
+// СООБЩЕНИЯ
 function renderMessages() {
   chatDiv.innerHTML = "";
   if (!currentChat) return;
@@ -49,17 +50,17 @@ function addMessage(text, isUser) {
   if (isUser) {
     div.innerText = text;
   } else {
-    stream(text, div);
+    fastType(text, div);
   }
 
   chatDiv.appendChild(div);
   chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
-// ===== СТРИМИНГ =====
-function stream(text, el) {
+// БЫСТРАЯ ПЕЧАТЬ
+function fastType(text, el) {
   let i = 0;
-  const speed = 6;
+  const speed = 2;
 
   const interval = setInterval(() => {
     el.innerText += text[i];
@@ -68,25 +69,59 @@ function stream(text, el) {
   }, speed);
 }
 
-// ===== ОТПРАВКА =====
+// АВТО НАЗВАНИЕ
+async function generateTitle(text) {
+  const res = await fetch("https://api.together.xyz/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer ТВОЙ_API_КЛЮЧ",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "meta-llama/Meta-Llama-3-8B-Instruct",
+      messages: [
+        { role: "system", content: "Короткое название чата (2-3 слова)" },
+        { role: "user", content: text }
+      ],
+      max_tokens: 10
+    })
+  });
+
+  const data = await res.json();
+  return data.choices[0].message.content.trim();
+}
+
+// ОТПРАВКА
 async function send() {
-  const text = msg.value;
+  const input = document.getElementById("msg");
+  const text = input.value;
+
   if (!text || !currentChat) return;
 
   addMessage(text, true);
   chats[currentChat].push({ role: "user", content: text });
 
-  msg.value = "";
-  typing.style.display = "block";
+  input.value = "";
+
+  // авто название
+  if (chats[currentChat].length === 1) {
+    const title = await generateTitle(text);
+    chats[title] = chats[currentChat];
+    delete chats[currentChat];
+    currentChat = title;
+    renderChats();
+  }
 
   const res = await fetch("https://api.together.xyz/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer tgp_v1_70-LWiq-vf0vDkNPoQ1hYLdAeQZlv25RpyORWm4e_cw",
+      "Authorization": "Bearer ТВОЙ_API_КЛЮЧ",
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      model: "meta-llama/Meta-Llama-3-8B-Instruct",
+      max_tokens: 200,
+      temperature: 0.7,
       messages: chats[currentChat]
     })
   });
@@ -94,45 +129,17 @@ async function send() {
   const data = await res.json();
   const reply = data.choices[0].message.content;
 
-  typing.style.display = "none";
-
   chats[currentChat].push({ role: "assistant", content: reply });
   save();
 
   addMessage(reply, false);
-  speak(reply);
 }
 
-// ===== ОЧИСТКА =====
-function clearChat() {
-  if (!currentChat) return;
-  chats[currentChat] = [];
-  save();
-  renderMessages();
-}
-
-// ===== СОХРАНЕНИЕ =====
+// СОХРАНЕНИЕ
 function save() {
   localStorage.setItem("index_chats", JSON.stringify(chats));
 }
 
-// ===== ГОЛОС =====
-function speak(text) {
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "ru-RU";
-  speechSynthesis.speak(speech);
-}
-
-function voice() {
-  const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  rec.lang = "ru-RU";
-
-  rec.onresult = e => {
-    msg.value = e.results[0][0].transcript;
-  };
-
-  rec.start();
-}
-
-// запуск
+// СТАРТ
+renderChats();
 renderChats();
