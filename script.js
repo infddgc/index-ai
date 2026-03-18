@@ -115,7 +115,7 @@ async function send() {
   const res = await fetch("https://api.together.xyz/v1/chat/completions", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer ТВОЙ_API_КЛЮЧ",
+      "Authorization": "Bearer tgp_v1_70-LWiq-vf0vDkNPoQ1hYLdAeQZlv25RpyORWm4e_cw",
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
