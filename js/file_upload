@@ -1,0 +1,17 @@
+export function initFileUpload(sendMessage) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      sendMessage(`Файл: ${file.name}\n${reader.result}`);
+    };
+
+    if (file.type.includes("text")) reader.readAsText(file);
+    else reader.readAsDataURL(file);
+  };
+  document.body.appendChild(input);
+}
