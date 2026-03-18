@@ -1,18 +1,68 @@
+const API_KEY = "tgp_v1_dF02yOUYxQwHn7q_yxVxnvjvl393Q07VJG5xRgjf5rk";
+
+// AUTH
+const authDiv = document.getElementById("auth");
+const appDiv = document.getElementById("app");
+
+if (localStorage.getItem("user")) {
+  showApp();
+}
+
+function register() {
+  const login = document.getElementById("login").value;
+  const pass = document.getElementById("password").value;
+
+  if (!login || !pass) return alert("Заполни всё");
+
+  localStorage.setItem("user_" + login, pass);
+  alert("Аккаунт создан");
+}
+
+function loginUser() {
+  const login = document.getElementById("login").value;
+  const pass = document.getElementById("password").value;
+
+  const saved = localStorage.getItem("user_" + login);
+
+  if (saved === pass) {
+    localStorage.setItem("user", login);
+    showApp();
+  } else {
+    alert("Ошибка входа");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  location.reload();
+}
+
+function showApp() {
+  authDiv.style.display = "none";
+  appDiv.style.display = "flex";
+}
+
+// CHAT
 const chatDiv = document.getElementById("chat");
+const input = document.getElementById("msg");
+const sidebar = document.getElementById("sidebar");
+
 let chats = JSON.parse(localStorage.getItem("index_chats") || "{}");
 let currentChat = null;
 
-// ENTER
-document.getElementById("msg").addEventListener("keydown", function(e) {
+input?.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     e.preventDefault();
     send();
   }
 });
 
-// ЧАТЫ
+function toggleMenu() {
+  sidebar.classList.toggle("active");
+}
+
 function newChat() {
-  const id = "Чат " + Date.now();
+  const id = "Чат";
   chats[id] = [];
   currentChat = id;
   save();
@@ -33,7 +83,6 @@ function renderChats() {
   }
 }
 
-// СООБЩЕНИЯ
 function renderMessages() {
   chatDiv.innerHTML = "";
   if (!currentChat) return;
@@ -46,100 +95,48 @@ function renderMessages() {
 function addMessage(text, isUser) {
   const div = document.createElement("div");
   div.className = "message " + (isUser ? "user" : "bot");
-
-  if (isUser) {
-    div.innerText = text;
-  } else {
-    fastType(text, div);
-  }
-
+  div.innerText = text;
   chatDiv.appendChild(div);
   chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
-// БЫСТРАЯ ПЕЧАТЬ
-function fastType(text, el) {
-  let i = 0;
-  const speed = 2;
-
-  const interval = setInterval(() => {
-    el.innerText += text[i];
-    i++;
-    if (i >= text.length) clearInterval(interval);
-  }, speed);
-}
-
-// АВТО НАЗВАНИЕ
-async function generateTitle(text) {
-  const res = await fetch("https://api.together.xyz/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer ТВОЙ_API_КЛЮЧ",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "meta-llama/Meta-Llama-3-8B-Instruct",
-      messages: [
-        { role: "system", content: "Короткое название чата (2-3 слова)" },
-        { role: "user", content: text }
-      ],
-      max_tokens: 10
-    })
-  });
-
-  const data = await res.json();
-  return data.choices[0].message.content.trim();
-}
-
-// ОТПРАВКА
 async function send() {
-  const input = document.getElementById("msg");
   const text = input.value;
-
   if (!text || !currentChat) return;
 
   addMessage(text, true);
   chats[currentChat].push({ role: "user", content: text });
-
   input.value = "";
 
-  // авто название
-  if (chats[currentChat].length === 1) {
-    const title = await generateTitle(text);
-    chats[title] = chats[currentChat];
-    delete chats[currentChat];
-    currentChat = title;
-    renderChats();
+  try {
+    const res = await fetch("https://api.together.xyz/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "meta-llama/Meta-Llama-3-8B-Instruct",
+        max_tokens: 200,
+        messages: chats[currentChat]
+      })
+    });
+
+    const data = await res.json();
+    const reply = data?.choices?.[0]?.message?.content || "Ошибка";
+
+    addMessage(reply, false);
+    chats[currentChat].push({ role: "assistant", content: reply });
+
+    save();
+
+  } catch {
+    addMessage("❌ Ошибка сети", false);
   }
-
-  const res = await fetch("https://api.together.xyz/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer tgp_v1_70-LWiq-vf0vDkNPoQ1hYLdAeQZlv25RpyORWm4e_cw",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "meta-llama/Meta-Llama-3-8B-Instruct",
-      max_tokens: 200,
-      temperature: 0.7,
-      messages: chats[currentChat]
-    })
-  });
-
-  const data = await res.json();
-  const reply = data.choices[0].message.content;
-
-  chats[currentChat].push({ role: "assistant", content: reply });
-  save();
-
-  addMessage(reply, false);
 }
 
-// СОХРАНЕНИЕ
 function save() {
   localStorage.setItem("index_chats", JSON.stringify(chats));
 }
 
-// СТАРТ
-renderChats();
 renderChats();
