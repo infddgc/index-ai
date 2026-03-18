@@ -2,20 +2,40 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Index AI</title>
+
 <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
 </head>
 <body>
 
-<div class="app">
+<!-- LOGIN -->
+<div id="auth" class="auth">
+  <h1>Index</h1>
+  <input id="login" placeholder="Логин">
+  <input id="password" type="password" placeholder="Пароль">
+  <button onclick="register()">Регистрация</button>
+  <button onclick="loginUser()">Войти</button>
+</div>
 
-  <div class="sidebar">
+<!-- APP -->
+<div class="app" id="app" style="display:none;">
+
+  <div class="sidebar" id="sidebar">
     <h2>Index</h2>
     <button onclick="newChat()">+ Новый чат</button>
+    <button onclick="logout()">Выйти</button>
     <div id="chatList"></div>
   </div>
 
   <div class="main">
+    <div class="topbar">
+      <button onclick="toggleMenu()">☰</button>
+      <span>Index</span>
+    </div>
+
     <div id="chat"></div>
 
     <div class="input-area">
@@ -27,9 +47,14 @@
 </div>
 
 <script src="script.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+
 </body>
 </html>
-
-<script src="script.js"></script>
 </body>
 </html>
