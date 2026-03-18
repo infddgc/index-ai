@@ -3,17 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Index AI PRO</title>
+<title>Index AI Мини</title>
 
+<!-- Стили -->
 <link rel="stylesheet" href="style/main.css">
 <link rel="stylesheet" href="style/chat.css">
 <link rel="stylesheet" href="style/mobile.css">
-<link rel="stylesheet" href="style/profile.css">
-<link rel="stylesheet" href="style/settings.css">
 
 </head>
 <body>
-<div id="app"></div>
-<script type="module" src="js/app.js"></script>
+<div id="app">
+  <div class="layout">
+    <div id="sidebar">
+      <button id="newChatBtn">+ Новый чат</button>
+      <div id="chatList"></div>
+    </div>
+    <div id="chat">
+      <div id="messages"></div>
+      <input id="input" placeholder="Напиши сообщение...">
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script type="module">
+  // Минимальный рабочий JS
+  const chatList = document.getElementById("chatList");
+  const messages = document.getElementById("messages");
+  const input = document.getElementById("input");
+  let chats = {};
+  let currentChat = null;
+
+  function renderChats() {
+    chatList.innerHTML = "";
+    Object.keys(chats).forEach(id => {
+      const div = document.createElement("div");
+      div.innerText = id;
+      div.onclick = () => { currentChat = id; renderMessages(); };
+      chatList.appendChild(div);
+    });
+  }
+
+  function renderMessages() {
+    messages.innerHTML = "";
+    if (!currentChat) return;
+    chats[currentChat].forEach(msg => {
+      const div = document.createElement("div");
+      div.className = msg.user ? "user" : "bot";
+      div.innerText = msg.text;
+      messages.appendChild(div);
+    });
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  document.getElementById("newChatBtn").onclick = () => {
+    const id = "Чат " + (Object.keys(chats).length + 1);
+    chats[id] = [];
+    currentChat = id;
+    renderChats();
+    renderMessages();
+  };
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      if (!currentChat) return;
+      chats[currentChat].push({ user: true, text });
+      chats[currentChat].push({ user: false, text: "Привет! Это заглушка ИИ." }); // временный ответ
+      renderMessages();
+    }
+  });
+
+  console.log("Минимальный чат запущен ✅");
+</script>
 </body>
 </html>
