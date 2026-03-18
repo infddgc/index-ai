@@ -1,0 +1,14 @@
+import { chats, currentChat, newChat, renderChats } from "./chat_manager.js";
+import { initSearch } from "./search.js";
+
+export function initSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  sidebar.innerHTML = `
+    <button id="newChatBtn">+ Новый чат</button>
+    <div id="chatList"></div>
+  `;
+
+  document.getElementById("newChatBtn").onclick = () => { newChat(); };
+  renderChats();
+  initSearch(chats, renderChats);
+}
